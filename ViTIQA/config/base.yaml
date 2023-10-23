@@ -1,0 +1,17 @@
+n_classes: 1
+
+encoder:
+  n_layers: 14
+  d_model: 384
+  n_heads: 6
+  dim_feedforward: 1152
+  dropout: 0.1
+  act: 'gelu'
+  backbone:
+    n_blocks: 4
+    in_channels: 3
+    inner_channels: 32
+    out_channels: ${encoder.d_model}
+    kernel_size: 3
+    stride: 1
+    padding: 1
