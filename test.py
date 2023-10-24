@@ -5,8 +5,8 @@ import time
 
 
 config = OmegaConf.load('ViTIQA/config/base.yaml')
-model = ViT(config)
-print(model)
+model = ViT(config['encoder'])
+# print(model)
 print(sum(p.numel() for p in model.parameters()))
 
 x = torch.rand(60, 3, 32, 1024)

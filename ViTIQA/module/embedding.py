@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 from ViTIQA.module.pos_enc import PositionalEncoding2D
 from einops.layers.torch import Rearrange
