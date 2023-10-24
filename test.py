@@ -1,11 +1,11 @@
-from ViTIQA.model.iqa import IQARegressor 
+from ViTIQA.model.vit import ViT 
 from omegaconf import OmegaConf
 import torch
 import time
 
 
 config = OmegaConf.load('ViTIQA/config/base.yaml')
-model = IQARegressor(config)
+model = ViT(config)
 print(model)
 print(sum(p.numel() for p in model.parameters()))
 

@@ -15,3 +15,27 @@ encoder:
     kernel_size: 3
     stride: 1
     padding: 1
+
+train_dataset:
+  manifest_path: '.'
+  batch_size: 32
+  shuffle: true
+  num_workers: 4
+  norm:
+    mean: ${processor.mean}
+    std: ${processor.std}
+  flip: true
+
+val_dataset:
+  manifest_path: '.'
+  batch_size: 32
+  shuffle: false
+  num_workers: 4
+  norm:
+    mean: ${processor.mean}
+    std: ${processor.std}
+  flip: false
+
+processor:
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
