@@ -1,4 +1,4 @@
-from ViTIQA.model.vit import ViT 
+from ViTIQA.module.vit import ViT 
 from omegaconf import OmegaConf
 import torch
 import time

@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
-from ViTIQA.model.pos_enc import PositionalEncoding2D
+from ViTIQA.module.pos_enc import PositionalEncoding2D
 from einops.layers.torch import Rearrange
-from ViTIQA.model.backbone import ResNetBackbone
+from ViTIQA.module.backbone import ResNetBackbone
 
 
 class IQAEmbedding(nn.Module):

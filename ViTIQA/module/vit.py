@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 from einops import repeat
-from ViTIQA.model.embedding import IQAEmbedding
-from ViTIQA.model.pos_enc import LearnablePositionalEncoding
+from ViTIQA.module.embedding import IQAEmbedding
+from ViTIQA.module.pos_enc import LearnablePositionalEncoding
 
 
 class ViT(nn.Module):
