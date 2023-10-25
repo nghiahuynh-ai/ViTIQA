@@ -1,11 +1,6 @@
 device: 'cuda'
 n_classes: 1
 
-embedding:
-  backbone: resnet50
-  d_model: ${encoder.d_model}
-  spatial_grid: 16
-
 encoder:
   n_layers: 14
   d_model: 384
@@ -14,6 +9,11 @@ encoder:
   dropout: 0.1
   act: 'gelu'
   n_classes: ${n_classes}
+
+  embedding:
+    backbone: resnet50
+    d_model: ${encoder.d_model}
+    spatial_grid: 16
 
 train_dataset:
   manifest_path: '/home/trainai/data/iqa/koniq10k/train.json'

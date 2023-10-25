@@ -1,8 +1,6 @@
-import torch
 import torch.nn as nn
 from einops import repeat
 from ViTIQA.module.embedding import IQAEmbedding
-from ViTIQA.module.pos_enc import PositionalEncoding
 
 
 class ViTIQA(nn.Module):

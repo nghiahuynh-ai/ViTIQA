@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from einops import repeat
-from ViTIQA.module.backbone import ResNetBackbone
+from ViTIQA.module.feature_extractor import ResNetBackbone
 
 
 class IQAEmbedding(nn.Module):

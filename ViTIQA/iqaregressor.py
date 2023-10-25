@@ -7,7 +7,7 @@ from torch.optim import (
     SGD,
     lr_scheduler,
 )
-from members.nghiahnh.src.ViTIQA.ViTIQA.module.vitiqa import ViT
+from ViTIQA.module.vitiqa import ViTIQA
 from torchvision import transforms
 from ViTIQA.util.optim import NoamScheduler
 from ViTIQA.data.dataset import IQADataset
@@ -23,7 +23,7 @@ class IQARegressor(pl.LightningModule):
         
         self.cfg = cfg
         
-        self.model = ViT(config=cfg['encoder'])
+        self.model = ViTIQA(config=cfg['encoder'])
         
         self.optimizer = SGD(
             params=self.parameters(),
