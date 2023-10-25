@@ -1,8 +1,14 @@
 import torch.nn as nn
+import numpy as np
 import lightning.pytorch as pl
 from omegaconf import DictConfig
-from torch.optim import AdamW
-from ViTIQA.module.vit import ViT
+from torch.optim import (
+    AdamW,
+    SGD,
+    lr_scheduler,
+)
+from members.nghiahnh.src.ViTIQA.ViTIQA.module.vitiqa import ViT
+from torchvision import transforms
 from ViTIQA.util.optim import NoamScheduler
 from ViTIQA.data.dataset import IQADataset
 from torchmetrics import (
@@ -19,34 +25,32 @@ class IQARegressor(pl.LightningModule):
         
         self.model = ViT(config=cfg['encoder'])
         
-        self.optimizer = AdamW(
+        self.optimizer = SGD(
             params=self.parameters(),
             lr=cfg['optimizer']['lr'],
-            betas=cfg['optimizer']['betas'],
-            weight_decay=cfg['optimizer']['weight_decay'],
-            eps=1e-9,
+            momentum=0.9,
+            weight_decay=0,
         )
-        self.scheduler = NoamScheduler(
-            self.optimizer,
-            factor=cfg['optimizer']['factor'],
-            model_size=cfg['optimizer']['model_size'],
-            warmup_steps=cfg['optimizer']['warmup_steps'],
+        self.scheduler = lr_scheduler.CosineAnnealingLR(
+            self.optimizer, 
+            T_max=3e4, 
+            eta_min=0,
         )
         
         self.criterion = nn.L1Loss()
         
         self.metrics = {
-            'SRCC': SpearmanCorrCoef(),
-            'PLCC': PearsonCorrCoef(),
+            'SRCC': SpearmanCorrCoef().to(cfg['device']),
+            'PLCC': PearsonCorrCoef().to(cfg['device']),
         }
         
         self.train_data = IQADataset(cfg['train_dataset'])
-        self.valid_data = IQADataset(cfg['valid_dataset'])
-    
+        self.valid_data = IQADataset(cfg['val_dataset'])
+
     def training_step(self, batch, batch_idx):
         imgs, scores = batch
         
-        outputs = self.model(imgs).sigmoid()
+        outputs = self.model(imgs).squeeze(1)
         loss = self.criterion(outputs, scores)
         
         log_dict = {
@@ -63,15 +67,15 @@ class IQARegressor(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         imgs, scores = batch
         
-        outputs = self.model(imgs).sigmoid()
+        outputs = self.model(imgs).squeeze(1)
         loss = self.criterion(outputs, scores)
-        srcc = self.metrics['SRCC'](outputs, scores)
-        plcc = self.metrics['PLCC'](outputs, scores)
+        # srcc = self.metrics['SRCC'](outputs, scores)
+        # plcc = self.metrics['PLCC'](outputs, scores)
         
         log_dict = {
-            "train_loss": {"value": loss, "on_step": True, "on_epoch": True, "prog_bar": True, "logger": True},
-            "srcc": {"value": srcc, "on_step": False, "on_epoch": True, "prog_bar": True, "logger": True},
-            "plcc": {"value": plcc, "on_step": False, "on_epoch": True, "prog_bar": True, "logger": True},
+            "val_loss": {"value": loss, "on_step": True, "on_epoch": True, "prog_bar": True, "logger": True},
+            # "srcc": {"value": srcc, "on_step": False, "on_epoch": True, "prog_bar": True, "logger": True},
+            # "plcc": {"value": plcc, "on_step": False, "on_epoch": True, "prog_bar": True, "logger": True},
         }
         self._logging(log_dict)
 
@@ -81,7 +85,16 @@ class IQARegressor(pl.LightningModule):
         return
     
     def predict(self, imgs=None, imgs_dir=None):
-        return
+        transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    tuple(self.cfg['processor']['mean']), 
+                    tuple(self.cfg['processor']['std'])
+                ),
+            ])
+        imgs = transform(np.array(imgs.convert('RGB')))
+        scores = self.model(imgs.unsqueeze(0))
+        return scores
     
     def _logging(self, logs: dict):
         for key in logs:
@@ -101,6 +114,6 @@ class IQARegressor(pl.LightningModule):
                 "scheduler": self.scheduler,
                 "interval": "step",
                 "frequency": 1,
-                "monitor": "srcc",
+                "monitor": "val_loss",
             },
         }

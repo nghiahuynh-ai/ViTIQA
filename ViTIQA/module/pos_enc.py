@@ -79,8 +79,8 @@ class PositionalEncoding2D(nn.Module):
         emb[:, :, : self.channels] = emb_x
         emb[:, :, self.channels : 2 * self.channels] = emb_y
 
-        self.cached_penc = emb[None, :, :, :orig_ch].repeat(tensor.shape[0], 1, 1, 1)
-        return self.cached_penc.permute(0, 3, 1, 2)
+        self.cached_penc = emb[None, :, :, :orig_ch].repeat(tensor.shape[0], 1, 1, 1).permute(0, 3, 1, 2)
+        return self.cached_penc
     
     def get_emb(self, sin_inp):
         """

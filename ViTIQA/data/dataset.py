@@ -20,28 +20,28 @@ class IQADataset(Dataset):
             for line in f:
                 line = json.loads(line)
                 if os.path.isfile(line['path']):
-                    if line['score'] < 0 or line['score'] > 1:
-                        raise ValueError('Score must be in the range of [0, 1]!')
+                    # if line['score'] < 0 or line['score'] > 1:
+                    #     raise ValueError('Score must be in the range of [0, 1]!')
                     samples.append((line['path'], line['score']))
         self.samples = samples
         
         if config['flip']:
             transform = transforms.Compose([
+                transforms.ToTensor(),
                 transforms.Normalize(
                     tuple(config['norm']['mean']), 
                     tuple(config['norm']['std'])
                 ),
                 transforms.RandomHorizontalFlip(),
                 transforms.RandomVerticalFlip(),
-                transforms.ToTensor(),
             ])
         else:
             transform = transforms.Compose([
+                transforms.ToTensor(),
                 transforms.Normalize(
                     tuple(config['norm']['mean']), 
                     tuple(config['norm']['std'])
                 ),
-                transforms.ToTensor(),
             ])
         
         self.loader = DataLoader(
